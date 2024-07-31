@@ -1,0 +1,854 @@
+<html><head><base href="https://www.websimdomain.com/music-player/"><title>Reproductor de Música Colaborativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #1DB954;
+    --secondary-color: #1ED760;
+    --background: #121212;
+    --surface: #282828;
+    --on-background: #FFFFFF;
+    --on-surface: #B3B3B3;
+    --on-primary: #000000;
+    --danger: #E91429;
+    --accent: #1ED760;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background);
+    color: var(--on-background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  #player {
+    background-color: var(--surface);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #now-playing {
+    text-align: center;
+    margin-bottom: 24px;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--on-background);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  
+  #audio {
+    width: 100%;
+    margin-bottom: 24px;
+    border-radius: 50px;
+    overflow: hidden;
+  }
+  
+  #audio::-webkit-media-controls-panel {
+    background-color: var(--surface);
+  }
+  
+  #audio::-webkit-media-controls-current-time-display,
+  #audio::-webkit-media-controls-time-remaining-display {
+    color: var(--on-surface);
+  }
+  
+  #audio::-webkit-media-controls-play-button,
+  #audio::-webkit-media-controls-mute-button {
+    filter: invert(1);
+  }
+
+  #playlist {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 24px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  #playlist::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #playlist::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 4px;
+  }
+  
+  #playlist::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+  }
+  
+  #playlist li {
+    cursor: pointer;
+    padding: 16px;
+    background-color: var(--surface);
+    margin-bottom: 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  #playlist li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  #playlist li.active {
+    background-color: rgba(29, 185, 84, 0.3);
+    color: var(--primary-color);
+  }
+  
+  #playlist li .material-icons {
+    margin-right: 12px;
+    font-size: 24px;
+  }
+  
+  #controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  
+  button {
+    background-color: transparent;
+    border: none;
+    color: var(--on-surface);
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+  
+  button:hover {
+    color: var(--on-background);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  button:active {
+    transform: scale(0.95);
+  }
+  
+  button .material-icons {
+    font-size: 36px;
+  }
+  
+  #file-upload {
+    margin-top: 24px;
+    text-align: center;
+  }
+  
+  #file-upload-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background-color: var(--primary-color);
+    color: var(--on-primary);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  #file-upload-label:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  
+  #file-upload-label:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  #file-upload-label .material-icons {
+    margin-right: 8px;
+    font-size: 24px;
+  }
+  
+  #file-upload-input {
+    display: none;
+  }
+
+  #load-api {
+    margin-top: 24px;
+  }
+
+  #api-input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    color: var(--on-background);
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  #api-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
+  }
+
+  #api-input::placeholder {
+    color: var(--on-surface);
+  }
+
+  .delete-button {
+    background-color: transparent;
+    color: var(--on-surface);
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .delete-button:hover {
+    color: var(--danger);
+    background-color: rgba(233, 20, 41, 0.1);
+  }
+
+  .song-title {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 12px;
+    font-weight: 500;
+  }
+
+  #volume-amplifier {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  #volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--on-surface);
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+  }
+
+  #volume-slider:hover {
+    opacity: 1;
+  }
+
+  #volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+  }
+
+  #volume-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+  }
+
+  #volume-label {
+    margin-top: 8px;
+    font-weight: 600;
+    color: var(--on-surface);
+  }
+
+  #visualizer-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    margin-top: 24px;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  #visualizer {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  #fullscreen-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #fullscreen-button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+
+  #shuffle-button {
+    margin-left: 12px;
+  }
+
+  #shuffle-button.active {
+    color: var(--primary-color);
+  }
+
+  #share-container {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  #share-url {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    color: var(--on-background);
+    font-size: 16px;
+  }
+
+  #copy-button {
+    background-color: var(--primary-color);
+    color: var(--on-primary);
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  #copy-button:hover {
+    background-color: var(--secondary-color);
+  }
+
+  @media (max-width: 480px) {
+    #player {
+      padding: 24px;
+    }
+
+    #now-playing {
+      font-size: 20px;
+    }
+
+    button {
+      padding: 8px;
+    }
+
+    button .material-icons {
+      font-size: 28px;
+    }
+
+    #playlist li {
+      padding: 12px;
+    }
+
+    #visualizer-container {
+      height: 150px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="player">
+    <div id="now-playing">Reproductor de Música Colaborativo</div>
+    <audio id="audio" controls></audio>
+    <div id="visualizer-container">
+      <canvas id="visualizer"></canvas>
+      <button id="fullscreen-button"><i class="material-icons">fullscreen</i></button>
+    </div>
+    <div id="volume-amplifier">
+      <input type="range" min="0" max="200" value="100" class="slider" id="volume-slider">
+      <div id="volume-label">Volumen: 100%</div>
+    </div>
+    <ul id="playlist"></ul>
+    <div id="controls">
+      <button id="prev"><i class="material-icons">skip_previous</i></button>
+      <button id="play-pause"><i class="material-icons">play_arrow</i></button>
+      <button id="next"><i class="material-icons">skip_next</i></button>
+      <button id="shuffle-button"><i class="material-icons">shuffle</i></button>
+    </div>
+    <div id="file-upload">
+      <label for="file-upload-input" id="file-upload-label">
+        <i class="material-icons">cloud_upload</i>Cargar audio
+      </label>
+      <input type="file" id="file-upload-input" accept="audio/*" multiple />
+    </div>
+    <div id="load-api">
+      <input type="text" id="api-input" placeholder="Ingrese la URL de la API" />
+      <button id="load-api-button"><i class="material-icons">cloud_download</i>Cargar desde API</button>
+    </div>
+    <div id="share-container">
+      <input type="text" id="share-url" readonly>
+      <button id="copy-button">Copiar enlace</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+  <script>
+    const audio = document.getElementById('audio');
+    const playlist = document.getElementById('playlist');
+    const prevButton = document.getElementById('prev');
+    const playPauseButton = document.getElementById('play-pause');
+    const nextButton = document.getElementById('next');
+    const nowPlaying = document.getElementById('now-playing');
+    const fileUploadInput = document.getElementById('file-upload-input');
+    const loadApiButton = document.getElementById('load-api-button');
+    const apiInput = document.getElementById('api-input');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeLabel = document.getElementById('volume-label');
+    const visualizer = document.getElementById('visualizer');
+    const fullscreenButton = document.getElementById('fullscreen-button');
+    const shuffleButton = document.getElementById('shuffle-button');
+    const shareUrl = document.getElementById('share-url');
+    const copyButton = document.getElementById('copy-button');
+
+    let appState = {
+      currentTrack: 0,
+      songs: [],
+      volume: 1,
+      isPlaying: false,
+      shuffle: true
+    };
+
+    let audioContext;
+    let source;
+    let gainNode;
+    let analyser;
+
+    // Inicializar Socket.IO
+    const socket = io('https://your-server-url.com');
+
+    // Generar un ID único para la sesión
+    const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+    // Actualizar la URL compartida
+    shareUrl.value = `${window.location.origin}${window.location.pathname}?session=${sessionId}`;
+
+    // Manejar la copia del enlace
+    copyButton.addEventListener('click', () => {
+      shareUrl.select();
+      document.execCommand('copy');
+      alert('Enlace copiado al portapapeles');
+    });
+
+    // Unirse a la sala de Socket.IO
+    socket.emit('join', sessionId);
+
+    // Escuchar actualizaciones de la lista de reproducción
+    socket.on('playlistUpdate', (updatedPlaylist) => {
+      appState.songs = updatedPlaylist;
+      loadPlaylist();
+    });
+
+    // Escuchar cambios en la canción actual
+    socket.on('currentTrackUpdate', (trackIndex) => {
+      playSong(trackIndex);
+    });
+
+    function initAudioContext() {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      source = audioContext.createMediaElementSource(audio);
+      gainNode = audioContext.createGain();
+      analyser = audioContext.createAnalyser();
+
+      source.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      // Set up visualizer
+      analyser.fftSize = 256;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const canvas = visualizer;
+      const canvasCtx = canvas.getContext('2d');
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+
+      function getColor(value) {
+        const hue = ((value / 255) * 360).toFixed(0);
+        return `hsl(${hue}, 100%, 50%)`;
+      }
+
+      function draw() {
+        requestAnimationFrame(draw);
+
+        analyser.getByteFrequencyData(dataArray);
+
+        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = dataArray[i] * 2;
+
+          canvasCtx.fillStyle = getColor(dataArray[i]);
+          canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+          x += barWidth + 1;
+        }
+      }
+
+      draw();
+    }
+
+    volumeSlider.addEventListener('input', function() {
+      const volume = this.value / 100;
+      appState.volume = volume;
+      updateVolumeLabel();
+      if (gainNode) {
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+      }
+      saveAppState();
+    });
+
+    function updateVolumeLabel() {
+      volumeLabel.textContent = `Volumen: ${Math.round(appState.volume * 100)}%`;
+    }
+
+    function loadAppState() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedSessionId = urlParams.get('session');
+
+      if (sharedSessionId) {
+        // Si hay un ID de sesión en la URL, únete a esa sesión
+        sessionId = sharedSessionId;
+        socket.emit('join', sessionId);
+        socket.emit('requestPlaylist', sessionId);
+      } else {
+        // Si no hay ID de sesión, carga el estado local
+        const request = indexedDB.open('MusicPlayerDB', 1);
+
+        request.onerror = function(event) {
+          console.error("Error al abrir la base de datos:", event.target.error);
+        };
+
+        request.onsuccess = function(event) {
+          const db = event.target.result;
+          const transaction = db.transaction(['appState'], 'readonly');
+          const objectStore = transaction.objectStore('appState');
+          const getRequest = objectStore.get('currentState');
+
+          getRequest.onerror = function(event) {
+            console.error("Error al obtener el estado de la aplicación:", event.target.error);
+          };
+
+          getRequest.onsuccess = function(event) {
+            if (event.target.result) {
+              appState = event.target.result;
+              loadPlaylist();
+              if (appState.songs.length > 0) {
+                loadSong(appState.currentTrack);
+              }
+              volumeSlider.value = appState.volume * 100;
+              updateVolumeLabel();
+              updateShuffleButton();
+            }
+          };
+        };
+
+        request.onupgradeneeded = function(event) {
+          const db = event.target.result;
+          db.createObjectStore('appState', { keyPath: 'id' });
+        };
+      }
+    }
+
+    function saveAppState() {
+      const request = indexedDB.open('MusicPlayerDB', 1);
+
+      request.onerror = function(event) {
+        console.error("Error al abrir la base de datos:", event.target.error);
+      };
+
+      request.onsuccess = function(event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['appState'], 'readwrite');
+        const objectStore = transaction.objectStore('appState');
+        const putRequest = objectStore.put({ id: 'currentState', ...appState });
+
+        putRequest.onerror = function(event) {
+          console.error("Error al guardar el estado de la aplicación:", event.target.error);
+        };
+
+        putRequest.onsuccess = function(event) {
+          console.log("Estado de la aplicación guardado correctamente");
+        };
+      };
+    }
+
+    function loadPlaylist() {
+      playlist.innerHTML = '';
+      appState.songs.forEach((song, index) => {
+        const li = document.createElement('li');
+        const icon = document.createElement('i');
+        icon.className = 'material-icons';
+        icon.textContent = 'music_note';
+        li.appendChild(icon);
+        const span = document.createElement('span');
+        span.className = 'song-title';
+        span.textContent = song.title;
+        li.appendChild(span);
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-button';
+        deleteButton.innerHTML = '<i class="material-icons">delete</i>';
+        deleteButton.onclick = (e) => {
+          e.stopPropagation();
+          deleteSong(index);
+        };
+        li.appendChild(deleteButton);
+        li.onclick = () => playSong(index);
+        playlist.appendChild(li);
+      });
+    }
+
+    function loadSong(index) {
+      appState.currentTrack = index;
+      audio.src = appState.songs[appState.currentTrack].url;
+      updateNowPlaying();
+      highlightCurrentSong();
+      socket.emit('updateCurrentTrack', { sessionId, trackIndex: index });
+    }
+
+    function playSong(index) {
+      if (index !== appState.currentTrack) {
+        loadSong(index);
+      }
+      audio.play();
+      appState.isPlaying = true;
+      updatePlayPauseIcon();
+      saveAppState();
+      
+      if (!audioContext) {
+        initAudioContext();
+      }
+      gainNode.gain.setValueAtTime(appState.volume, audioContext.currentTime);
+    }
+
+    function pauseSong() {
+      audio.pause();
+      appState.isPlaying = false;
+      updatePlayPauseIcon();
+      saveAppState();
+    }
+
+    function updateNowPlaying() {
+      nowPlaying.textContent = appState.songs[appState.currentTrack].title;
+    }
+
+    function highlightCurrentSong() {
+      const items = playlist.getElementsByTagName('li');
+      for (let i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+      }
+      items[appState.currentTrack].classList.add('active');
+    }
+
+    function getNextTrack() {
+      if (appState.shuffle) {
+        return Math.floor(Math.random() * appState.songs.length);
+      } else {
+        return (appState.currentTrack + 1) % appState.songs.length;
+      }
+    }
+
+    function getPrevTrack() {
+      if (appState.shuffle) {
+        return Math.floor(Math.random() * appState.songs.length);
+      } else {
+        return (appState.currentTrack - 1 + appState.songs.length) % appState.songs.length;
+      }
+    }
+
+    function playNext() {
+      if (appState.songs.length > 0) {
+        const nextTrack = getNextTrack();
+        playSong(nextTrack);
+      }
+    }
+
+    function playPrev() {
+      if (appState.songs.length > 0) {
+        const prevTrack = getPrevTrack();
+        playSong(prevTrack);
+      }
+    }
+
+    function togglePlayPause() {
+      if (appState.isPlaying) {
+        pauseSong();
+      } else {
+        playSong(appState.currentTrack);
+      }
+    }
+
+    function updatePlayPauseIcon() {
+      playPauseButton.innerHTML = appState.isPlaying
+        ? '<i class="material-icons">pause</i>'
+        : '<i class="material-icons">play_arrow</i>';
+    }
+
+    function addSong(title, url) {
+      appState.songs.push({ title, url });
+      loadPlaylist();
+      saveAppState();
+      socket.emit('updatePlaylist', { sessionId, playlist: appState.songs });
+    }
+
+    function deleteSong(index) {
+      appState.songs.splice(index, 1);
+      if (index === appState.currentTrack) {
+        if (appState.songs.length > 0) {
+          playSong(0);
+        } else {
+          audio.pause();
+          audio.src = '';
+          nowPlaying.textContent = 'Reproductor de Música Colaborativo';
+          appState.isPlaying = false;
+          updatePlayPauseIcon();
+        }
+      } else if (index < appState.currentTrack) {
+        appState.currentTrack--;
+      }
+      loadPlaylist();
+      saveAppState();
+      socket.emit('updatePlaylist', { sessionId, playlist: appState.songs });
+    }
+
+    function toggleShuffle() {
+      appState.shuffle = !appState.shuffle;
+      updateShuffleButton();
+      saveAppState();
+    }
+
+    function updateShuffleButton() {
+      if (appState.shuffle) {
+        shuffleButton.classList.add('active');
+      } else {
+        shuffleButton.classList.remove('active');
+      }
+    }
+
+    audio.addEventListener('ended', playNext);
+    nextButton.onclick = playNext;
+    prevButton.onclick = playPrev;
+    playPauseButton.onclick = togglePlayPause;
+    shuffleButton.onclick = toggleShuffle;
+
+    fileUploadInput.addEventListener('change', function(e) {
+      const files = e.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file && file.type.startsWith('audio/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const title = file.name;
+            const url = e.target.result;
+            addSong(title, url);
+            if (appState.songs.length === 1) {
+              playSong(0);
+            }
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert(`El archivo "${file.name}" no es un archivo de audio válido.`);
+        }
+      }
+    });
+
+    loadApiButton.addEventListener('click', function() {
+      const apiUrl = apiInput.value.trim();
+      if (!apiUrl) {
+        alert('Por favor, ingrese la URL de la API');
+        return;
+      }
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          appState.songs = data.map(song => ({
+            title: song.title,
+            url: song.url
+          }));
+          loadPlaylist();
+          if (appState.songs.length > 0) {
+            playSong(0);
+          }
+          saveAppState();
+          socket.emit('updatePlaylist', { sessionId, playlist: appState.songs });
+        })
+        .catch(error => {
+          console.error('Error al cargar la lista de reproducción desde la API:', error);
+          alert('Error al cargar la lista de reproducción desde la API. Por favor, verifique la URL e inténtelo de nuevo.');
+        });
+    });
+
+    fullscreenButton.addEventListener('click', function() {
+      if (!document.fullscreenElement) {
+        if (visualizer.requestFullscreen) {
+          visualizer.requestFullscreen();
+        } else if (visualizer.mozRequestFullScreen) { // Firefox
+          visualizer.mozRequestFullScreen();
+        } else if (visualizer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+          visualizer.webkitRequestFullscreen();
+        } else if (visualizer.msRequestFullscreen) { // IE/Edge
+          visualizer.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
+      }
+    });
+
+    // Cargar el estado de la aplicación al iniciar
+    loadAppState();
+  </script>
+</body></html>
