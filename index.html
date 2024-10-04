@@ -1,6 +1,12 @@
 <html><head><base href="https://www.websimdomain.com/music-player/"><title>Reproductor de Música Estilo Spotify con Reproducción Aleatoria</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   <SCRIPT>
+        if (!location.hash.replace('#', '').length) {
+            location.href = location.href.split('#')[0] + '#' + (Math.random() * 100).toString().replace('.', '');
+            location.reload();
+        }
+    </SCRIPT>
 <style>
   :root {
     --primary-color: #1DB954;
